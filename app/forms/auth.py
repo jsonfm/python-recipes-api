@@ -1,6 +1,7 @@
 from wtforms import Form, BooleanField, StringField, PasswordField, validators
 
 
+
 class LoginForm(Form):
     email = StringField('Email', [validators.Length(min=6, max=35), validators.DataRequired()])
     password = PasswordField('Password', [
@@ -15,8 +16,14 @@ class SignupForm(Form):
     ])
     confirm = PasswordField('Confirm', [
         validators.DataRequired(),
+        validators.EqualTo("password", "Passwords don't match!")
     ])
 
+
 class UpdatePasswordForm(Form):
-    password = PasswordField('Password')
-    confirm = PasswordField('Confirm')
+    password = PasswordField('Password', [
+        validators.DataRequired(),
+    ])
+    confirm = PasswordField('Confirm', [
+        validators.DataRequired(),
+    ])

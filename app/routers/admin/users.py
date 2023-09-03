@@ -1,17 +1,31 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify
 from app.models.users import User
 
 
-router = Blueprint("users", __name__)
+router = Blueprint("users", __name__, url_prefix="/users")
 
 
-@router.route("/users")
+@router.route("/")
 def users():
-    users = User.query.limit(10).all()
-    return "users"
+    limit = request.args.get("limit", 20)
+    users = User.get_list(limit)
+    response = {
+        "users": users
+    }
+    return jsonify(response)
 
-@router.route("/users/<int:user_id>")
-def user(user_id):
-    user = User.query.filter(User.id == user_id).first()
-    print("user: ", user)
-    return "user"
+
+@router.route("/<int:user_id>", methods=["GET"])
+def user(user_id: int):
+    user = User.get_by_id(user_id)
+    return jsonify(user)
+
+
+@router.route("/<int:user_id>", methods=["DELETE"])
+def delete_user(user_id: int):
+    user = User.get_by_id(user_id, to_dict=False)
+    if user is not None:
+        User.delete(user)
+        return "user deleted!", 200
+    else:
+        return "user does not exist!", 400
